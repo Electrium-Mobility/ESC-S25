@@ -1,0 +1,6 @@
+{
+    "cmake.sourceDirectory": "C:/Users/colin/OneDrive/Documents/ESC-S25/ESC-S25",
+    "idf.espIdfPathWin": "C:\\Users\\colin\\esp\\v5.4.1\\esp-idf",
+    "idf.toolsPathWin": "C:\\Users\\colin\\Espressif",
+    "idf.pythonInstallPath": "C:\\Users\\colin\\Espressif\\tools\\idf-python\\3.11.2\\python.exe"
+}
