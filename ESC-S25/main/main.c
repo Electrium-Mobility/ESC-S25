@@ -15,18 +15,6 @@
 
 void app_main(void)
 {
-    // TODO
-    /*
-    Driver
-    - FOC
-    - Space vector modulation
-    - constant torque
-    - constant velocity
-    - constant current
-
-
-    ADC
-
-    CAN*/
+    
 
 }
