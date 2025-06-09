@@ -13,6 +13,12 @@
 #include "esp_flash.h"
 #include "esp_system.h"
 
+#define TAG "main"
+#define 
+
+
+
+
 void app_main(void)
 {
     // TODO
@@ -30,3 +36,4 @@ void app_main(void)
     CAN*/
 
 }
+
