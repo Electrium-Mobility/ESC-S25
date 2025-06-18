@@ -1,3 +1,3 @@
-idf_component_register(SRCS "main.c" "ESC_S25.c"
-                    PRIV_REQUIRES spi_flash
-                    INCLUDE_DIRS "")
+set(SOURCES main.cpp)
+idf_component_register(SRCS ${SOURCES}
+                    INCLUDE_DIRS . ../include)
