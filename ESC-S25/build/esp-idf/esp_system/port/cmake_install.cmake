@@ -39,6 +39,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/esp-idf/esp_system/port/soc/esp32/cmake_install.cmake")
+  include("C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/esp-idf/esp_system/port/soc/esp32/cmake_install.cmake")
 endif()
 

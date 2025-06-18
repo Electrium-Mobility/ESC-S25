@@ -18,8 +18,8 @@ end
 
 # Load bootloader symbols
 set confirm off
-    add-symbol-file C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader/bootloader.elf
+    add-symbol-file C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader/bootloader.elf
 set confirm on
 
 # Load application symbols
-file C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/ESC-S25.elf
+file C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/ESC-S25.elf
