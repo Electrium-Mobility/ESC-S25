@@ -10,18 +10,18 @@ if(NOT EXISTS "C:/Users/colin/esp/v5.4.1/esp-idf/components/bootloader/subprojec
   file(MAKE_DIRECTORY "C:/Users/colin/esp/v5.4.1/esp-idf/components/bootloader/subproject")
 endif()
 file(MAKE_DIRECTORY
-  "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader"
-  "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix"
-  "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/tmp"
-  "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp"
-  "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src"
-  "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader"
+  "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix"
+  "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/tmp"
+  "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src"
+  "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
+    file(MAKE_DIRECTORY "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
 endif()

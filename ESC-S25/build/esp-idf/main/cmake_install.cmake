@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/colin/OneDrive - University of Waterloo/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/main
+# Install script for directory: C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
