@@ -1,3 +1,4 @@
-set(SOURCES main.cpp)
+set(SOURCES ./src/main.cpp)
+
 idf_component_register(SRCS ${SOURCES}
-                    INCLUDE_DIRS . ../include)
+                        INCLUDE_DIRS ./inc)
