@@ -18,15 +18,14 @@ class BLDC6PWMDriver : public BLDCDriver {
          * @param enable_pin Optional enable pin for the driver, default is NOT_DEFINED
          */
         BLDC6PWMDriver(int pin_A_PWM_H, int pin_A_PWM_L, int pin_B_PWM_H, int pin_B_PWM_L, int pin_C_PWM_H, int pin_C_PWM_L, 
-                    int pin_CAP0, int pin_CAP1, int pin_CAP2, int enable_pin = NOT_DEFINED);
-
+            int enable_pin = NOT_DEFINED);
+        
         /**
          * @brief Constructor for the BLDC6PWMDriver class with voltage and frequency parameters
          */
-        BLDC6PWMDriver(int pin_A_PWM_H, int pin_A_PWM_L, int pin_B_PWM_H, int pin_B_PWM_L, int pin_C_PWM_H, int pin_C_PWM_L, 
-                int pin_CAP0, int pin_CAP1, int pin_CAP2, int enable_pin = NOT_DEFINED,
-                float voltage_limit = NOT_DEFINED, float voltage_power_supply = DEFAULT_VOLTAGE_POWER_SUPPLY,
-                int pwm_freq = NOT_DEFINED);
+        BLDC6PWMDriver(int pin_A_PWM_H, int pin_A_PWM_L, int pin_B_PWM_H, int pin_B_PWM_L, int pin_C_PWM_H, int pin_C_PWM_L, int enable_pin = NOT_DEFINED,
+            float voltage_limit = NOT_DEFINED, float voltage_power_supply = DEFAULT_VOLTAGE_POWER_SUPPLY,
+            int pwm_freq = NOT_DEFINED);
         
         
         void init(void) override;
@@ -43,8 +42,5 @@ class BLDC6PWMDriver : public BLDCDriver {
         int pin_B_PWM_L; // Low PWM pin for phase B
         int pin_C_PWM_H; // High PWM pin for phase C
         int pin_C_PWM_L; // Low PWM pin for phase C
-        int pin_CAP0; // Capture pin 0
-        int pin_CAP1; // Capture pin 1
-        int pin_CAP2; // Capture pin 2
         int enable_pin; // Enable pin for the driver, if applicable
 };
