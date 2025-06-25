@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "ESC-S25",
-    "project_version":    "3e6f8d1-dirty",
+    "project_version":    "c53fd27-dirty",
     "project_path":       "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25",
     "idf_path":           "C:/Users/colin/esp/v5.4.1/esp-idf",
     "build_dir":          "C:/Users/colin/Documents/Electrium Moblity/ESC/ESC-S25/ESC-S25/build",

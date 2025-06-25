@@ -9,5 +9,19 @@
   "idf.toolsPathWin": "C:\\Users\\colin\\Espressif",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32"
+  },
+  "files.associations": {
+    "array": "cpp",
+    "bit": "cpp",
+    "charconv": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "string": "cpp",
+    "optional": "cpp",
+    "string_view": "cpp",
+    "format": "cpp",
+    "limits": "cpp",
+    "type_traits": "cpp",
+    "variant": "cpp"
   }
 }

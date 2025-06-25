@@ -1,7 +1,7 @@
 #include "freertos/FreeRTOS.h"
 #include "esp_attr.h"
 #include "esp_timer.h"
-#include <driver/mcpwm.h>
+#include <driver/mcpwm_prelude.h>
 #include <driver/mcpwm_timer.h>
 #include "esp_log.h"
 
