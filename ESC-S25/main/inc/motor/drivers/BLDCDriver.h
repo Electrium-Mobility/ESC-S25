@@ -1,4 +1,4 @@
-
+#include "esp_log.h"
 
 class BLDCDriver{
     public:
@@ -21,4 +21,4 @@ class BLDCDriver{
         * @note Va, Vb, Vc is NA notation, in EU they have Ua, Ub, Uc
         */
         virtual void setPwmVoltage(float Va, float Vb, float Vc);
-}
+};
