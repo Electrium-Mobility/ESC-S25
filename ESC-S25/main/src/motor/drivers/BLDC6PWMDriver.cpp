@@ -1,6 +1,7 @@
 #include "BLDC6PWMDriver.h"
 #include "DefaultValues.h"
 #include "esp_log.h"
+#include "GPIO.h"
 
 #define TAG "BLDC6PWMDriver"
 
@@ -46,7 +47,7 @@ BLDC6PWMDriver::BLDC6PWMDriver(int pin_A_PWM_H, int pin_A_PWM_L, int pin_B_PWM_H
 }
 
 
-void BLDC6PWMDriver::init(void) {
+void BLDC6PWMDriver::Init(void) {
     ESP_LOGI(TAG, "Initializing BLDC6PWMDriver...");
 
     // Initialize GPIOs for MCPWM
@@ -59,5 +60,37 @@ void BLDC6PWMDriver::init(void) {
     ESP_LOGI(TAG, "BLDC6PWMDriver initialized");
 }
 
+void BLDC6PWMDriver::Enable(void) {
+    ESP_LOGI(TAG, "Enabling BLDC6PWMDriver...");
+
+    // if (enable_pin != NOT_DEFINED) {
+    //     gpio_set_level(enable_pin, 1); // Set enable pin high
+    // }
+
+    ESP_LOGI(TAG, "BLDC6PWMDriver enabled");
+}
+
+void BLDC6PWMDriver::Disable(void) {
+    ESP_LOGI(TAG, "Disabling BLDC6PWMDriver...");
+
+    // if (enable_pin != NOT_DEFINED) {
+    //     gpio_set_level(enable_pin, 0); // Set enable pin low
+    // }
+
+    ESP_LOGI(TAG, "BLDC6PWMDriver disabled");
+}
+
+void BLDC6PWMDriver::SetPwmVoltage(float Va, float Vb, float Vc) {
+    ESP_LOGI(TAG, "Setting PWM voltages: Va=%f, Vb=%f, Vc=%f", Va, Vb, Vc);
+
+    float duty_cycle_A = Va / voltage_power_supply;
+    float duty_cycle_B = Vb / voltage_power_supply;
+    float duty_cycle_C = Vc / voltage_power_supply;
+
+    // Set the PWM duty cycles for each phase
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, duty_cycle_A * 100.0);
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_B, Vb / voltage_power_supply * 100.0);
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, Vc / voltage_power_supply * 100.0);
+}
 
 

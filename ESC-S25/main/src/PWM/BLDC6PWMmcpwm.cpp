@@ -52,6 +52,9 @@ void MCPWM_GPIO_init(int GPIO_MCPWM0A, int GPIO_MCPWM0B, int GPIO_MCPWM1A, int G
 
     // Configure MCPWM
     MCPWM_config();
+
+    // Start MCPWM
+    MCPWM_start();
 }
 
 void MCPWM_config() {
@@ -74,6 +77,7 @@ void MCPWM_config() {
     ESP_LOGI(TAG, "MCPWM configured");
 
 }
+
 
 
 void MCPWM_start(){

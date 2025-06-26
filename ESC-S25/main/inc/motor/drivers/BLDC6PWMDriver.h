@@ -27,15 +27,15 @@ class BLDC6PWMDriver : public BLDCDriver {
                 int pin_CAP0, int pin_CAP1, int pin_CAP2, int enable_pin = NOT_DEFINED,
                 float voltage_limit = NOT_DEFINED, float voltage_power_supply = DEFAULT_VOLTAGE_POWER_SUPPLY,
                 int pwm_freq = NOT_DEFINED);
-        
-        
-        void init(void) override;
 
-        void enable(void) override;
 
-        void disable(void) override;
+        void Init(void) override;
 
-        void setPwmVoltage(float Va, float Vb, float Vc) override;
+        void Enable(void) override;
+
+        void Disable(void) override;
+
+        void SetPwmVoltage(float Va, float Vb, float Vc) override;
 
         int pin_A_PWM_H; // High PWM pin for phase A
         int pin_A_PWM_L; // Low PWM pin for phase A

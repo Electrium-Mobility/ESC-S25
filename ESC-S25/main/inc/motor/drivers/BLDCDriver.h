@@ -3,11 +3,11 @@
 class BLDCDriver{
     public:
 
-        virtual void init(void);
+        virtual void Init(void);
 
-        virtual void enable(void);
+        virtual void Enable(void);
 
-        virtual void disable(void);
+        virtual void Disable(void);
 
         int pwm_freq;
         float voltage_limit;
@@ -20,5 +20,5 @@ class BLDCDriver{
         * @param Vc - voltage of phase C
         * @note Va, Vb, Vc is NA notation, in EU they have Ua, Ub, Uc
         */
-        virtual void setPwmVoltage(float Va, float Vb, float Vc);
+        virtual void SetPwmVoltage(float Va, float Vb, float Vc);
 };

@@ -1,28 +1,49 @@
-#include "BLDC6PWMmotor_controller.h"
+#include "Bldc6PwmMotorController.h"
+#include "esp_log.h"
+
+#define TAG "BBldc6PwmMotorController"
 
 
 
-void UpdateBLDCMotor(float magnitude, double angle){
-    
+Bldc6PwmMotorController::Bldc6PwmMotorController(int pole_pairs) : BLDCMotor(pole_pairs) {
+    // Initialize the driver
+    this->pole_pairs = pole_pairs;
+}
+
+void Bldc6PwmMotorController::DriverInit(BLDC6PWMDriver *driver) {
+    this->driver = driver;
+}
+
+void Bldc6PwmMotorController::ControllerInit() {
+    driver->init();
+    driver->enable();
+}
+
+void Bldc6PwmMotorController::Update(){
+    // Update the motor controller state
 }
 
 
 
-void SetPhaseVoltage(double voltage_q, double voltage_d, double angle){
+void Bldc6PwmMotorController::SetPhaseVoltage(double voltage_q, double voltage_d, double angle){
 
     int sector = 0;
 
     int Va, Vb, Vc;
 
-    double voltage_limit = DEFAULT_VOLTAGE_POWER_SUPPLY; // This should be set to the maximum voltage limit of the motor driver
-    
     switch(modulation) {
         case Trapezoid_120:
             // Trapezoidal modulation
+            ESP_LOGI("Bldc6PwmMotorController", "Trapezoidal modulation");
 
             // 1 = postive, -1 = negative, 0 = high-impedance
             static int trap_120_map[6][3] = {
-            {0,1,-1},{-1,1,0},{-1,0,1},{0,-1,1},{1,-1,0},{1,0,-1} // each is 60 degrees with values for 3 phases of 1=positive -1=negative 0=high-z
+                {0,1,-1},
+                {-1,1,0},
+                {-1,0,1},
+                {0,-1,1},
+                {1,-1,0},
+                {1,0,-1} // each is 60 degrees with values for 3 phases of 1=positive -1=negative 0=high-z
             };
             // static int trap_120_state = 0;
             sector = 6 * (fmod(angle + PI/6.0, 2 * PI) / (2 * PI)); // adding PI/6 to align with other modes
@@ -40,15 +61,15 @@ void SetPhaseVoltage(double voltage_q, double voltage_d, double angle){
         case Sinusoidal:
             // Sinusoidal modulation
 
-            
             break;
         case Space_Vector:
             // Space vector modulation
             break;
         default:
-            ESP_LOGE("BLDC6PWMmotor_controller", "Unknown modulation type");
             return;
     }
+
+    driver->SetPwmVoltage(Va, Vb, Vc);
 }
 
 
