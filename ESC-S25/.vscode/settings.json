@@ -22,6 +22,11 @@
     "format": "cpp",
     "limits": "cpp",
     "type_traits": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "mcpwm_prelude.h": "c",
+    "mcpwm_reg.h": "c",
+    "mcpwm_struct.h": "c",
+    "bldc6pwmdriver.h": "c",
+    "cmath": "cpp"
   }
 }
