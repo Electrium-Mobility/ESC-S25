@@ -1,28 +1,48 @@
-#define M_PI 3.14159265359
-#define M_2_PI 6.28318530718
-#define M_3_PI 9.42477796077
-#define M_3_PI_2 4.71238898038
-#define M_PI_2 1.57079632679
+#include "../util.h"
+#include "Driver/Bldc6PwmDriver.h"
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <inttypes.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+#include <math.h>
+#include "esp_timer.h"
+#include "esp_attr.h"
+#include "esp_log.h"
 
-#define SINE_SCALE_FACTOR    126.6873f   // scales radians to array index
-#define SINE_INDEX_PI_2      199         // index at π/2 radians
-#define SINE_INDEX_PI        398         // index at π radians
-#define SINE_INDEX_2_PI       796         // index at 2π radians
-#define SINE_SCALE_DOWN      0.0001f     // scale integer sine values to float
+#define _PI 3.14159265359
+#define _2_PI 6.28318530718
+#define _3_PI 9.42477796077
+#define _3_PI_2 4.71238898038
+#define _PI_2 1.57079632679
 
+#define SIN_SCALE_FACTOR    126.6873f   // scales radians to array index
+#define SIN_INDEX_PI_2      199         // index at π/2 radians
+#define SIN_INDEX_PI        398         // index at π radians
+#define SIN_INDEX_2_PI       796         // index at 2π radians
+#define SIN_SCALE_DOWN      0.0001f     // scale integer sine values to float
 
-#define constraint(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
-#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+typedef enum {
+  TRAPEZOIDAL_120, // Trapezoidal control with 120-degree commutation
+  FOC_SINUSOIDAL,  // Sinusoidal control
+  SPACE_VECTOR     // Space vector control
+} foc_modulation_mode_t;
+
 
 typedef enum{
-    trapezoidal_120,
-    sinusoidal,
-    space_vector
-} control_mode_t;
+  FOC_CONTROL_VOLTAGE, // Voltage control mode
+  FOC_CONTROL_ANGLE // Angle control mode
+} foc_control_mode_t;
 
+// FOC mode for the BLDC motor
+static const foc_modulation_mode_t foc_modulation_mode = TRAPEZOIDAL_120;
 
-// Control mode for the BLDC motor
-static const control_mode_t control_mode = trapezoidal_120;
+// Control mode for the FOC algorithm
+static const foc_control_mode_t foc_control_mode = FOC_CONTROL_VOLTAGE; // Can be voltage or angle control
+
 
 static const float voltage_power_supply = 12.0; // Example power supply voltage
 
@@ -30,66 +50,34 @@ static const float voltage_power_supply = 12.0; // Example power supply voltage
 // This can be changed to a lower value if needed
 static const float voltage_limit = voltage_power_supply; // Example voltage limit for the motor driver
 
-float Ua = 0.0f; // Phase A voltage
-float Ub = 0.0f; // Phase B voltage
-float Uc = 0.0f; // Phase C voltage
+extern float shaft_angle; // Mechanical angle of the motor shaft in radians
+extern int pole_pairs; // Number of pole pairs in the motor
+
+extern float voltage_q; // Voltage in the q-axis (quadrature axis)
+extern float voltage_d; // Voltage in the d-axis (direct axis)
+
+extern float Ua; // Phase A voltage
+extern float Ub; // Phase B voltage
+extern float Uc; // Phase C voltage
+
+extern float duty_A; // Duty cycle for phase A
+extern float duty_B; // Duty cycle for phase B
+extern float duty_C; // Duty cycle for phase C
 
 
+//---------//
+extern int sin_array[200]; // Sine lookup table for fast sine calculation
 
+void test_foc(void* arg);
 
-
-int sine_array[200] = {0,79,158,237,316,395,473,552,631,710,789,867,946,1024,1103,1181,1260,1338,1416,1494,1572,1650,1728,1806,1883,1961,2038,2115,2192,2269,2346,2423,2499,2575,2652,2728,2804,2879,2955,3030,3105,3180,3255,3329,3404,3478,3552,3625,3699,3772,3845,3918,3990,4063,4135,4206,4278,4349,4420,4491,4561,4631,4701,4770,4840,4909,4977,5046,5113,5181,5249,5316,5382,5449,5515,5580,5646,5711,5775,5839,5903,5967,6030,6093,6155,6217,6279,6340,6401,6461,6521,6581,6640,6699,6758,6815,6873,6930,6987,7043,7099,7154,7209,7264,7318,7371,7424,7477,7529,7581,7632,7683,7733,7783,7832,7881,7930,7977,8025,8072,8118,8164,8209,8254,8298,8342,8385,8428,8470,8512,8553,8594,8634,8673,8712,8751,8789,8826,8863,8899,8935,8970,9005,9039,9072,9105,9138,9169,9201,9231,9261,9291,9320,9348,9376,9403,9429,9455,9481,9506,9530,9554,9577,9599,9621,9642,9663,9683,9702,9721,9739,9757,9774,9790,9806,9821,9836,9850,9863,9876,9888,9899,9910,9920,9930,9939,9947,9955,9962,9969,9975,9980,9985,9989,9992,9995,9997,9999,10000,10000};
-
-
-/// @brief Compute the sine of an angle in radians.
-/// @param x The angle in radians.
-/// @return The sine of the angle.
-float fast_rad_sin(float x){
-    if(x < M_PI_2){
-    //return sine_array[(int)(199.0*( a / (_PI/2.0)))];
-    //return sine_array[(int)(126.6873* a)];           // float array optimized
-    return SINE_SCALE_DOWN*sine_array[round(SINE_SCALE_FACTOR * x)];      // int array optimized
-  }else if(x < M_PI){
-    // return sine_array[(int)(199.0*(1.0 - (a-M_PI_2) / (M_PI_2)))];
-    //return sine_array[398 - (int)(126.6873*a)];          // float array optimized
-    return SINE_SCALE_DOWN*sine_array[SINE_INDEX_PI - round(SINE_SCALE_FACTOR * x)];     // int array optimized
-  }else if(x < M_3_PI_2){
-    // return -sine_array[(int)(199.0*((a - _PI) / (_PI/2.0)))];
-    //return -sine_array[-398 + (int)(126.6873*a)];           // float array optimized
-    return -SINE_SCALE_DOWN*sine_array[-SINE_INDEX_PI + round(SINE_SCALE_FACTOR * x)];      // int array optimized
-  } else {
-    // return -sine_array[(int)(199.0*(1.0 - (a - 3*_PI/2) / (_PI/2.0)))];
-    //return -sine_array[796 - (int)(126.6873*a)];           // float array optimized
-    return -SINE_SCALE_DOWN*sine_array[SINE_INDEX_2_PI - round(SINE_SCALE_FACTOR * x)];      // int array optimized
-  }
-}
-
-/// @brief Compute the cosine of an angle in radians.
-/// @param x The angle in radians.
-/// @return The cosine of the angle.
-double fast_rad_cos(double x) {
-    // cos(x) = sin(x + π/2)
-    float x_sin = x + M_PI_2;
-    x_sin = x_sin > M_2_PI ? x_sin - M_2_PI : x_sin; // Normalize to [0, 2π]
-    return fast_rad_sin(x_sin);
-}
-
-
-/// @brief Normalize an angle to the range [0, 2π).
-/// @param x The angle in radians.
-/// @return The normalized angle in radians.
-float normalize_angle(float x) {
-     float a = fmod(x, M_2_PI);
-  return a >= 0 ? a : (a + M_2_PI);
-}
-
-
-float electrical_angle(float mechanical_angle, int pole_pairs) {
-    // Convert mechanical angle to electrical angle
-    return (mechanical_angle * pole_pairs);
-}
-
-
-
-
+// Function declarations for BldcController.c
+float normalize_radian_angle(float angle);
+void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int* sector);
+void set_phase_voltage(float Uq, float Ud, float elec_angle);
+void loop(void);
+void move_to(float target);
+float fast_rad_sin(float x);
+double fast_rad_cos(double x);
+float normalize_angle(float x);
+float electrical_angle(float mechanical_angle, int pole_pairs);
 

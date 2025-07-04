@@ -3,12 +3,13 @@
   "idf.espIdfPathWin": "C:\\Users\\colin\\esp\\v5.4.1\\esp-idf",
   "idf.pythonInstallPath": "C:\\Users\\colin\\Espressif\\tools\\idf-python\\3.11.2\\python.exe",
   "idf.openOcdConfigs": [
-    "board/esp32-wrover-kit-3.3v.cfg"
+    "interface/ftdi/esp32_devkitj_v1.cfg",
+    "target/esp32s3.cfg"
   ],
-  "idf.portWin": "COM16",
+  "idf.portWin": "COM10",
   "idf.toolsPathWin": "C:\\Users\\colin\\Espressif",
   "idf.customExtraVars": {
-    "IDF_TARGET": "esp32"
+    "IDF_TARGET": "esp32s3"
   },
   "files.associations": {
     "array": "cpp",
@@ -27,6 +28,9 @@
     "mcpwm_reg.h": "c",
     "mcpwm_struct.h": "c",
     "bldc6pwmdriver.h": "c",
-    "cmath": "cpp"
-  }
+    "cmath": "cpp",
+    "bldccontroller.h": "c",
+    "util.h": "c"
+  },
+  "idf.flashType": "UART"
 }

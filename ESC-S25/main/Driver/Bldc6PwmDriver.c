@@ -90,7 +90,7 @@ void pwm_config(long pwm_freq, float dead_time, int GPIO_A_H, int GPIO_A_L, int 
 }
 
 
-void pwm_write(float duty_A, float duty_B, float duty_C, int GPIO_A_H, int GPIO_A_L, int GPIO_B_H, int GPIO_B_L, int GPIO_C_H, int GPIO_C_L){
+void pwm_write(float duty_A, float duty_B, float duty_C){
     mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0A, duty_A*100.0); 
     mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0B, duty_B*100.0); 
     
@@ -99,4 +99,16 @@ void pwm_write(float duty_A, float duty_B, float duty_C, int GPIO_A_H, int GPIO_
 
     mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_2, MCPWM0A, duty_C*100.0);
     mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_2, MCPWM0B, duty_C*100.0);
+}
+
+void set_pwm(float Ua, float Ub, float Uc, float voltage_limit) {
+    Ua = constraint(Ua, -voltage_limit, voltage_limit);
+    Ub = constraint(Ub, -voltage_limit, voltage_limit);
+    Uc = constraint(Uc, -voltage_limit, voltage_limit);
+
+    float duty_A = constraint(Ua / voltage_limit, 0, 1.0f);
+    float duty_B = constraint(Ub / voltage_limit, 0, 1.0f);
+    float duty_C = constraint(Uc / voltage_limit, 0, 1.0f);
+
+    pwm_write(duty_A, duty_B, duty_C);
 }
