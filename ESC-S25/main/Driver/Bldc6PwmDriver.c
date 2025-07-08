@@ -19,7 +19,7 @@ typedef struct {
     mcpwm_io_signals_t mcpwm_cl;
 } bldc_config_t;
 
-void pwm_timer_config(long pwm_freq, float dead_time, mcpwm_unit_t mcpwm_unit) {
+void pwm_timer_config(long pwm_freq, mcpwm_unit_t mcpwm_unit) {
 
     mcpwm_config_t pwm_config; // Initialize MCPWM configuration
 
@@ -63,7 +63,7 @@ void pwm_timer_config(long pwm_freq, float dead_time, mcpwm_unit_t mcpwm_unit) {
     mcpwm_set_timer_sync_output(mcpwm_unit, MCPWM_TIMER_0, MCPWM_SWSYNC_SOURCE_TEZ); // Set Timer 0 as sync output
 }
 
-void pwm_config(long pwm_freq, float dead_time, int GPIO_A_H, int GPIO_A_L, int GPIO_B_H, int GPIO_B_L, int GPIO_C_H, int GPIO_C_L){
+void pwm_config(long pwm_freq, int GPIO_A_H, int GPIO_A_L, int GPIO_B_H, int GPIO_B_L, int GPIO_C_H, int GPIO_C_L){
     mcpwm_pin_config_t pin_config = {
         .mcpwm0a_out_num = GPIO_A_H,
         .mcpwm0b_out_num = GPIO_A_L,
@@ -74,19 +74,8 @@ void pwm_config(long pwm_freq, float dead_time, int GPIO_A_H, int GPIO_A_L, int 
     };
     mcpwm_set_pin(MCPWM_UNIT_0, &pin_config); // need to correct the hardcoded MCPWM_UNIT_0
 
-    pwm_timer_config(pwm_freq, dead_time, MCPWM_UNIT_0);
-    // MCPWM_Unit_1 -> Second MCPWM unit is used for capture
-    // mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM_CAP_0, GPIO_MCPWM_CAP0); // Set GPIO as CAP0
-    // mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM_CAP_1, GPIO_MCPWM_CAP1); // Set GPIO as CAP1
-    // mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM_CAP_2, GPIO_MCPWM_CAP2); // Set GPIO as CAP2
+    pwm_timer_config(pwm_freq, MCPWM_UNIT_0);
 
-
-    // NOT USED YET
-    // mcpwm_pin_config_t pin_config_capture = {
-    //     .mcpwm_cap0_in_num = GPIO_CAP0,
-    //     .mcpwm_cap1_in_num = GPIO_CAP1,
-    //     .mcpwm_cap2_in_num = GPIO_CAP2,
-    // };
 }
 
 

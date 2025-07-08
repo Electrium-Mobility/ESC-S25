@@ -6,7 +6,7 @@
     "interface/ftdi/esp32_devkitj_v1.cfg",
     "target/esp32s3.cfg"
   ],
-  "idf.portWin": "COM11",
+  "idf.portWin": "COM10",
   "idf.toolsPathWin": "C:\\Users\\colin\\Espressif",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
@@ -30,7 +30,8 @@
     "bldc6pwmdriver.h": "c",
     "cmath": "cpp",
     "bldccontroller.h": "c",
-    "util.h": "c"
+    "util.h": "c",
+    "esp_log.h": "c"
   },
   "idf.flashType": "UART"
 }

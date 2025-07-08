@@ -64,20 +64,29 @@ extern float duty_A; // Duty cycle for phase A
 extern float duty_B; // Duty cycle for phase B
 extern float duty_C; // Duty cycle for phase C
 
+extern long open_loop_timestamp;
+
+extern float pot_angle;
 
 //---------//
-extern int sin_array[200]; // Sine lookup table for fast sine calculation
+// extern int sin_array[200]; // Sine lookup table for fast sine calculation
 
-void test_foc(void* arg);
 
 // Function declarations for BldcController.c
 float normalize_radian_angle(float angle);
 void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int* sector);
 void set_phase_voltage(float Uq, float Ud, float elec_angle);
-void loop(void);
+
+// void loop(void);
+
+void vel_open_loop(float target_velocity);
 void move_to(float target);
 float fast_rad_sin(float x);
 double fast_rad_cos(double x);
 float normalize_angle(float x);
 float electrical_angle(float mechanical_angle, int pole_pairs);
+long micros(void);
+
+
+void foc_init();
 

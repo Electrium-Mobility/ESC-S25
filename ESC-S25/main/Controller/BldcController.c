@@ -2,12 +2,12 @@
 #include "Driver/Bldc6PwmDriver.h"
 
 
-#define A_H 13
-#define A_L 14
-#define B_H 11
-#define B_L 12
-#define C_H 21
-#define C_L 47
+#define A_H 35
+#define A_L 36
+#define B_H 37
+#define B_L 38
+#define C_H 39
+#define C_L 40
 
 #define POT_GPIO 36 // GPIO for potentiometer input
 
@@ -23,16 +23,17 @@ float duty_A = 0.0f; // Duty cycle for phase A
 float duty_B = 0.0f; // Duty cycle for phase B
 float duty_C = 0.0f; // Duty cycle for phase C
 
-int sin_array[200] = {0,79,158,237,316,395,473,552,631,710,789,867,946,1024,1103,1181,1260,1338,1416,1494,1572,1650,1728,1806,1883,1961,2038,2115,2192,2269,2346,2423,2499,2575,2652,2728,2804,2879,2955,3030,3105,3180,3255,3329,3404,3478,3552,3625,3699,3772,3845,3918,3990,4063,4135,4206,4278,4349,4420,4491,4561,4631,4701,4770,4840,4909,4977,5046,5113,5181,5249,5316,5382,5449,5515,5580,5646,5711,5775,5839,5903,5967,6030,6093,6155,6217,6279,6340,6401,6461,6521,6581,6640,6699,6758,6815,6873,6930,6987,7043,7099,7154,7209,7264,7318,7371,7424,7477,7529,7581,7632,7683,7733,7783,7832,7881,7930,7977,8025,8072,8118,8164,8209,8254,8298,8342,8385,8428,8470,8512,8553,8594,8634,8673,8712,8751,8789,8826,8863,8899,8935,8970,9005,9039,9072,9105,9138,9169,9201,9231,9261,9291,9320,9348,9376,9403,9429,9455,9481,9506,9530,9554,9577,9599,9621,9642,9663,9683,9702,9721,9739,9757,9774,9790,9806,9821,9836,9850,9863,9876,9888,9899,9910,9920,9930,9939,9947,9955,9962,9969,9975,9980,9985,9989,9992,9995,9997,9999,10000,10000};
+float pot_angle = 0;
 
+long open_loop_timestamp = 0; // Timestamp for open loop control
 
+// int sin_array[200] = {0,79,158,237,316,395,473,552,631,710,789,867,946,1024,1103,1181,1260,1338,1416,1494,1572,1650,1728,1806,1883,1961,2038,2115,2192,2269,2346,2423,2499,2575,2652,2728,2804,2879,2955,3030,3105,3180,3255,3329,3404,3478,3552,3625,3699,3772,3845,3918,3990,4063,4135,4206,4278,4349,4420,4491,4561,4631,4701,4770,4840,4909,4977,5046,5113,5181,5249,5316,5382,5449,5515,5580,5646,5711,5775,5839,5903,5967,6030,6093,6155,6217,6279,6340,6401,6461,6521,6581,6640,6699,6758,6815,6873,6930,6987,7043,7099,7154,7209,7264,7318,7371,7424,7477,7529,7581,7632,7683,7733,7783,7832,7881,7930,7977,8025,8072,8118,8164,8209,8254,8298,8342,8385,8428,8470,8512,8553,8594,8634,8673,8712,8751,8789,8826,8863,8899,8935,8970,9005,9039,9072,9105,9138,9169,9201,9231,9261,9291,9320,9348,9376,9403,9429,9455,9481,9506,9530,9554,9577,9599,9621,9642,9663,9683,9702,9721,9739,9757,9774,9790,9806,9821,9836,9850,9863,9876,9888,9899,9910,9920,9930,9939,9947,9955,9962,9969,9975,9980,9985,9989,9992,9995,9997,9999,10000,10000};
 
 float normalize_radian_angle(float angle) {
     while (angle > _2_PI) angle -= _2_PI;
     while (angle < 0.0) angle += _2_PI;
     return angle;
 }
-
 
 /*
 /// @brief Compute the sine of an angle in radians.
@@ -69,13 +70,10 @@ double fast_rad_cos(double x) {
 }
 */
 
-
-
 float electrical_angle(float mechanical_angle, int pole_pairs) {
     // Convert mechanical angle to electrical angle
     return (mechanical_angle * pole_pairs);
 }
-
 
 void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int* sector) {
     // Implement trapezoidal 120 control logic
@@ -85,10 +83,12 @@ void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int
         {0,1,-1},{-1,1,-1},{-1,1,0},{-1,1,1},{-1,0,1},{-1,-1,1},{0,-1,1},{1,-1,1},{1,-1,0},{1,-1,-1},{1,0,-1},{1,1,-1} 
     };
 
-    int local_sector = 6 * (normalize_radian_angle(elec_angle + _PI / 6.0) / _2_PI); // Convert electrical angle to sector (0-11)
+    int local_sector = 6 * (normalize_radian_angle(elec_angle + _PI / 6.0)); // Convert electrical angle to sector (0-11)
     if (sector) {
         *sector = local_sector;
     }
+
+    printf("Sector: %d, Electrical Angle: %.2f rad\n", local_sector, elec_angle);
 
     // ESP_LOGI("BLDC", "Sector: %d, Electrical Angle: %.2f rad", local_sector, elec_angle);
     // vTaskDelay(5 / portTICK_PERIOD_MS); // Delay for 10 milliseconds
@@ -96,14 +96,15 @@ void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int
     Ua = Uq + trapezoidal_120_map[local_sector][0] * Uq;
     Ub = Uq + trapezoidal_120_map[local_sector][1] * Uq;
     Uc = Uq + trapezoidal_120_map[local_sector][2] * Uq;
-        
+
     Ua += voltage_limit / 2 - Uq;
     Ub += voltage_limit / 2 - Uq;
     Uc += voltage_limit / 2 - Uq;
 
+    // printf("Before set_pwm\n");
     set_pwm(Ua, Ub, Uc, voltage_limit);
+    // printf("After set_pwm\n");
 }
-
 
 void set_phase_voltage(float Uq, float Ud, float elec_angle){
 
@@ -126,42 +127,50 @@ void set_phase_voltage(float Uq, float Ud, float elec_angle){
 }
 
 
-void loop(){
-    set_phase_voltage(voltage_limit, 0, electrical_angle(shaft_angle, pole_pairs));
+// void loop(){
+//     set_phase_voltage(voltage_limit, 0, electrical_angle(shaft_angle, pole_pairs));
+// }
+
+
+void vel_open_loop(float target_velocity) {
+    // get current timestamp
+    long now_us = micros();
+    // calculate the sample time from last call
+    float Ts = (now_us - open_loop_timestamp) * 1e-6;
+    printf("Ts: %.6f seconds, now: %ld, past: %ld\n", Ts, now_us, open_loop_timestamp);
+    // calculate the necessary angle to achieve target velocity
+    shaft_angle += target_velocity*Ts; 
+
+    float temp_angle = normalize_radian_angle(shaft_angle); // Ensure shaft angle is within [0, 2π]
+
+    printf("Shaft Angle: %.2f rad, Target Velocity: %.2f\n", temp_angle, target_velocity);
+
+    // set the maximal allowed voltage (voltage_limit) with the necessary angle
+    set_phase_voltage(voltage_limit,  0, electrical_angle(temp_angle, pole_pairs));
+
+    // save timestamp for next call
+    open_loop_timestamp = now_us;
 }
 
-void move_to(float target){
-    switch (foc_control_mode) {
-        case FOC_CONTROL_VOLTAGE:
-            voltage_q = target; // Set the target voltage in the q-axis
-            break;
-        case FOC_CONTROL_ANGLE:
+long micros() {
+    return (long)esp_timer_get_time();
+}
+// void move_to(float target){
+//     switch (foc_control_mode) {
+//         case FOC_CONTROL_VOLTAGE:
+//             voltage_q = target; // Set the target voltage in the q-axis
+//             break;
+//         case FOC_CONTROL_ANGLE:
             
-            break;
-        default:
-            // Handle unsupported control mode
-            break;
-    }
-}
+//             break;
+//         default:
+//             // Handle unsupported control mode
+//             break;
+//     }
+// }
 
 
+void foc_init(){
+    pwm_config(40000, A_H, A_L, B_H, B_L, C_H, C_L);
 
-void test_foc(void* arg, int angle) {
-    pwm_config(1000, 0.0001, A_H, A_L, B_H, B_L, C_H, C_L);
-
-
-
-    while(1){
-        shaft_angle += _PI / 24; // Increment the shaft angle by 0.5 radians
-        shaft_angle = fmod(shaft_angle, _2_PI); // Keep the angle within 0 to 2π
-
-
-        // ESP_LOGI("BLDC", "Shaft Angle: %.2f rad", shaft_angle);
-        // ESP_LOGI("BLDC", "Electrical Angle: %.2f rad", electrical_angle(shaft_angle, pole_pairs));
-
-        loop();
-
-        vTaskDelay(100 / portTICK_PERIOD_MS); // Delay for 10 milliseconds
-        // fflush(stdout);
-    }
 }
