@@ -30,7 +30,9 @@
     "bldc6pwmdriver.h": "c",
     "cmath": "cpp",
     "bldccontroller.h": "c",
-    "util.h": "c"
+    "util.h": "c",
+    "math.h": "c",
+    "inttypes.h": "c"
   },
   "idf.flashType": "UART"
 }
