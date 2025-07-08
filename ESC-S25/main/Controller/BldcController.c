@@ -1,6 +1,16 @@
 #include "BldcController.h"
 #include "Driver/Bldc6PwmDriver.h"
 
+
+#define A_H 13
+#define A_L 14
+#define B_H 11
+#define B_L 12
+#define C_H 21
+#define C_L 47
+
+#define POT_GPIO 36 // GPIO for potentiometer input
+
 // Variable definitions for externs in BldcController.h
 float shaft_angle = 0.0f; // Mechanical angle of the motor shaft in radians
 int pole_pairs = 6; // Number of pole pairs in the motor
@@ -24,7 +34,7 @@ float normalize_radian_angle(float angle) {
 }
 
 
-
+/*
 /// @brief Compute the sine of an angle in radians.
 /// @param x The angle in radians.
 /// @return The sine of the angle.
@@ -57,6 +67,8 @@ double fast_rad_cos(double x) {
     x_sin = x_sin > _2_PI ? x_sin - _2_PI : x_sin; // Normalize to [0, 2π]
     return fast_rad_sin(x_sin);
 }
+*/
+
 
 
 float electrical_angle(float mechanical_angle, int pole_pairs) {
@@ -83,7 +95,7 @@ void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int
     
     Ua = Uq + trapezoidal_120_map[local_sector][0] * Uq;
     Ub = Uq + trapezoidal_120_map[local_sector][1] * Uq;
-        Uc = Uq + trapezoidal_120_map[local_sector][2] * Uq;
+    Uc = Uq + trapezoidal_120_map[local_sector][2] * Uq;
         
     Ua += voltage_limit / 2 - Uq;
     Ub += voltage_limit / 2 - Uq;
@@ -134,11 +146,13 @@ void move_to(float target){
 
 
 
-void test_foc(void* arg){
-    pwm_config(1000, 0.0001, 13, 14, 11, 12, 21, 47);
+void test_foc(void* arg, int angle) {
+    pwm_config(1000, 0.0001, A_H, A_L, B_H, B_L, C_H, C_L);
+
+
 
     while(1){
-        // shaft_angle += _PI / 24; // Increment the shaft angle by 0.5 radians
+        shaft_angle += _PI / 24; // Increment the shaft angle by 0.5 radians
         shaft_angle = fmod(shaft_angle, _2_PI); // Keep the angle within 0 to 2π
 
 
@@ -147,7 +161,7 @@ void test_foc(void* arg){
 
         loop();
 
-        // vTaskDelay(10 / portTICK_PERIOD_MS); // Delay for 10 milliseconds
+        vTaskDelay(100 / portTICK_PERIOD_MS); // Delay for 10 milliseconds
         // fflush(stdout);
     }
 }

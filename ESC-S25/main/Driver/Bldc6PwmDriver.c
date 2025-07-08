@@ -92,7 +92,7 @@ void pwm_config(long pwm_freq, float dead_time, int GPIO_A_H, int GPIO_A_L, int 
 
 void pwm_write(float duty_A, float duty_B, float duty_C){
     mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0A, duty_A*100.0); 
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0B, duty_B*100.0); 
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0B, duty_A*100.0); 
     
     mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM0A, duty_B*100.0); 
     mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM0B, duty_B*100.0); 
