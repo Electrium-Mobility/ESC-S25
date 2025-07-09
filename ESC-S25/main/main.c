@@ -16,7 +16,7 @@
 
 #include "driver/adc.h"
 
-const TickType_t xDelay = 100 / portTICK_PERIOD_MS;
+const TickType_t xDelay = 50 / portTICK_PERIOD_MS;
 
 TaskHandle_t handle_test_duty = NULL;
 TaskHandle_t handle_pot_to_angle = NULL;

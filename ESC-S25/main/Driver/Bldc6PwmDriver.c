@@ -79,25 +79,27 @@ void pwm_config(long pwm_freq, int GPIO_A_H, int GPIO_A_L, int GPIO_B_H, int GPI
 }
 
 
-void pwm_write(float duty_A, float duty_B, float duty_C){
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0A, duty_A*100.0); 
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0B, duty_A*100.0); 
-    
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM0A, duty_B*100.0); 
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM0B, duty_B*100.0); 
+void pwm_write(float duty_A_H, float duty_A_L, float duty_B_H, float duty_B_L, float duty_C_H, float duty_C_L){
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0A, duty_A_H*100.0); 
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM0B, duty_A_L*100.0); 
 
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_2, MCPWM0A, duty_C*100.0);
-    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_2, MCPWM0B, duty_C*100.0);
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM0A, duty_B_H*100.0); 
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM0B, duty_B_L*100.0); 
+
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_2, MCPWM0A, duty_C_H*100.0);
+    mcpwm_set_duty(MCPWM_UNIT_0, MCPWM_TIMER_2, MCPWM0B, duty_C_L*100.0);
 }
 
-void set_pwm(float Ua, float Ub, float Uc, float voltage_limit) {
-    Ua = constraint(Ua, -voltage_limit, voltage_limit);
-    Ub = constraint(Ub, -voltage_limit, voltage_limit);
-    Uc = constraint(Uc, -voltage_limit, voltage_limit);
+// void set_pwm(float Ua_H, float Ua_L, float Ub_H, float Ub_L, float Uc_H, float Uc_L, float voltage_limit) {
+//     // float duty_A = constraint(Ua / voltage_limit, 0, 1.0f);
+//     // float duty_B = constraint(Ub / voltage_limit, 0, 1.0f);
+//     // float duty_C = constraint(Uc / voltage_limit, 0, 1.0f);
+//     float duty_A_H = Ua_H / 1.0f; // Assuming voltage_limit is 1.0 for simplicity
+//     float duty_A_L = Ua_L / 1.0f; // Assuming voltage_limit is 1.0 for simplicity
+//     float duty_B_H = Ub_H / 1.0f; // Assuming voltage_limit is 1.0 for simplicity
+//     float duty_B_L = Ub_L / 1.0f; // Assuming voltage_limit is 1.0 for simplicity
+//     float duty_C_H = Uc_H / 1.0f; // Assuming voltage_limit is 1.0 for simplicity
+//     float duty_C_L = Uc_L / 1.0f; // Assuming voltage_limit is 1.0 for simplicity
 
-    float duty_A = constraint(Ua / voltage_limit, 0, 1.0f);
-    float duty_B = constraint(Ub / voltage_limit, 0, 1.0f);
-    float duty_C = constraint(Uc / voltage_limit, 0, 1.0f);
-
-    pwm_write(duty_A, duty_B, duty_C);
-}
+//     pwm_write(duty_A_H, duty_A_L, duty_B_H, duty_B_L, duty_C_H, duty_C_L);
+// }

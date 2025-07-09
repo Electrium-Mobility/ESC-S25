@@ -16,12 +16,18 @@ float shaft_angle = 0.0f; // Mechanical angle of the motor shaft in radians
 int pole_pairs = 6; // Number of pole pairs in the motor
 float voltage_q = 0.0f; // Voltage in the q-axis (quadrature axis)
 float voltage_d = 0.0f; // Voltage in the d-axis (direct axis)
-float Ua = 0.0f; // Phase A voltage
-float Ub = 0.0f; // Phase B voltage
-float Uc = 0.0f; // Phase C voltage
-float duty_A = 0.0f; // Duty cycle for phase A
-float duty_B = 0.0f; // Duty cycle for phase B
-float duty_C = 0.0f; // Duty cycle for phase C
+float Ua_H = 0.0f; // Phase A high-side voltage
+float Ua_L = 0.0f; // Phase A low-side voltage
+float Ub_H = 0.0f; // Phase B high-side voltage
+float Ub_L = 0.0f; // Phase B low-side voltage
+float Uc_H = 0.0f; // Phase C high-side voltage
+float Uc_L = 0.0f; // Phase C low-side voltage
+float duty_A_H = 0.0f; // Duty cycle for phase A high-side
+float duty_A_L = 0.0f; // Duty cycle for phase A low-side
+float duty_B_H = 0.0f; // Duty cycle for phase B high-side
+float duty_B_L = 0.0f; // Duty cycle for phase B low-side
+float duty_C_H = 0.0f; // Duty cycle for phase C high-side
+float duty_C_L = 0.0f; // Duty cycle for phase C low-side
 
 float pot_angle = 0;
 
@@ -75,34 +81,126 @@ float electrical_angle(float mechanical_angle, int pole_pairs) {
     return (mechanical_angle * pole_pairs);
 }
 
-void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int* sector) {
+void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float angle, int* sector) {
     // Implement trapezoidal 120 control logic
 
-    // // each is 30 degrees with values for 3 phases of 1=positive -1=negative 0=high-impedance
-    static int trapezoidal_120_map[12][3] = {
-        {0,1,-1},{-1,1,-1},{-1,1,0},{-1,1,1},{-1,0,1},{-1,-1,1},{0,-1,1},{1,-1,1},{1,-1,0},{1,-1,-1},{1,0,-1},{1,1,-1} 
+    // // each is 30 degrees with values for 3 phases of 1=positive 0=negative -1=high-impedance (downwards), -2=high-impedance (upwards)
+    static int trap_120_map[6][3] = {
+        {1, 0, -1},{1,-2,0},{-1,1,0},{0,1,-2},{0,-1,1},{-2,0,1} // each is 60 degrees with values for 3 phases of 1=positive -1=high-z 0=negative
     };
+    // int local_sector = 6 * (normalize_radian_angle(elec_angle + _PI / 6.0)); // Convert electrical angle to sector (0-11)
+    
+    // float percent_angle = elec_angle % _2_PI; // Ensure electrical angle is within [0, 2π]
 
-    int local_sector = 6 * (normalize_radian_angle(elec_angle + _PI / 6.0)); // Convert electrical angle to sector (0-11)
+    int local_sector = angle / _PI_3; // Convert electrical angle to sector (0-5)
+    float degree_angle = angle * (180.0 / _PI); // Convert radians to degrees
+
+
     if (sector) {
         *sector = local_sector;
     }
 
-    printf("Sector: %d, Electrical Angle: %.2f rad\n", local_sector, elec_angle);
+    float percent_angle = (float)fmod(angle, _PI_3);  // Ensure electrical angle is within [0, 2π]
+
 
     // ESP_LOGI("BLDC", "Sector: %d, Electrical Angle: %.2f rad", local_sector, elec_angle);
     // vTaskDelay(5 / portTICK_PERIOD_MS); // Delay for 10 milliseconds
-    
-    Ua = Uq + trapezoidal_120_map[local_sector][0] * Uq;
-    Ub = Uq + trapezoidal_120_map[local_sector][1] * Uq;
-    Uc = Uq + trapezoidal_120_map[local_sector][2] * Uq;
 
-    Ua += voltage_limit / 2 - Uq;
-    Ub += voltage_limit / 2 - Uq;
-    Uc += voltage_limit / 2 - Uq;
+    /*
+    L H SH
+    0 0 HI-z
+    0 1 H
+    1 0 L
+    1 1 Hi-z
+    
+    */
+
+
+    if (trap_120_map[local_sector][0] == -1){
+        if (percent_angle < 0.5) {
+            Ua_H = 1 - 2 * percent_angle;
+            Ua_L = 0;
+        } else {
+            Ua_H = 0;
+            Ua_L = percent_angle * 2 - 1;
+        }
+    }
+    else if(trap_120_map[local_sector][0] == -2){
+        if (percent_angle < 0.5) {
+            Ua_H = 0;
+            Ua_L = 1 - 2 * percent_angle;
+        } else {
+            Ua_H = 2 * percent_angle - 1;
+            Ua_L = 0;
+        }
+    }
+    else {
+        Ua_H = trap_120_map[local_sector][0];
+    }
+
+
+    if (trap_120_map[local_sector][1] == -1){
+        if (percent_angle < 0.5) {
+            Ub_H = 1 - 2 * percent_angle;
+            Ub_L = 0;
+        } else {
+            Ub_H = 0;
+            Ub_L = percent_angle * 2 - 1;
+        }
+    }
+    else if(trap_120_map[local_sector][1] == -2){
+        if (percent_angle < 0.5) {
+            Ub_H = 0;
+            Ub_L = 1 - 2 * percent_angle;
+        } else {
+            Ub_H = 2 * percent_angle - 1;
+            Ub_L = 0;
+        }
+    }
+    else {
+        Ub_H = trap_120_map[local_sector][1];
+    }
+
+    if (trap_120_map[local_sector][2] == -1){
+        if (percent_angle < 0.5) {
+            Uc_H = 1 - 2 * percent_angle;
+            Uc_L = 0;
+        } else {
+            Uc_H = 0;
+            Uc_L = percent_angle * 2 - 1;
+        }
+    }
+    else if(trap_120_map[local_sector][2] == -2){
+        if (percent_angle < 0.5) {
+            Uc_H = 0;
+            Uc_L = 1 - 2 * percent_angle;
+        } else {
+            Uc_H = 2 * percent_angle - 1;
+            Uc_L = 0;
+        }
+    }
+    else {
+        Uc_H = trap_120_map[local_sector][2];
+    }
+
+
+    Ua_H = constraint(Ua_H, 0.0f, 1.0f);
+    Ua_L = constraint(Ua_L, 0.0f, 1.0f);
+    Ub_H = constraint(Ub_H, 0.0f, 1.0f);
+    Ub_L = constraint(Ub_L, 0.0f, 1.0f);
+    Uc_H = constraint(Uc_H, 0.0f, 1.0f);
+    Uc_L = constraint(Uc_L, 0.0f, 1.0f);
+
+    printf("Sector: %d \t, Rad Angle: %.2f \t, Degree Angle: %.2f \t, Percent Angle: %.2f \t, UaH: %.2f \t, UaL: %.2f \n", local_sector, angle, degree_angle, percent_angle, Ua_H, Ua_L);
+
+    
+    if (Ua_L < 0 || Ua_L > 1){
+        ESP_LOGI("BLDC", "Ua_L out of bounds: %.2f", Ua_L);
+    }
+
 
     // printf("Before set_pwm\n");
-    set_pwm(Ua, Ub, Uc, voltage_limit);
+    pwm_write(Ua_H, Ua_L, Ub_H, Ub_L, Uc_H, Uc_L);
     // printf("After set_pwm\n");
 }
 
@@ -137,16 +235,17 @@ void vel_open_loop(float target_velocity) {
     long now_us = micros();
     // calculate the sample time from last call
     float Ts = (now_us - open_loop_timestamp) * 1e-6;
-    printf("Ts: %.6f seconds, now: %ld, past: %ld\n", Ts, now_us, open_loop_timestamp);
+    // printf("Ts: %.6f seconds, now: %ld, past: %ld\n", Ts, now_us, open_loop_timestamp);
     // calculate the necessary angle to achieve target velocity
     shaft_angle += target_velocity*Ts; 
 
     float temp_angle = normalize_radian_angle(shaft_angle); // Ensure shaft angle is within [0, 2π]
 
-    printf("Shaft Angle: %.2f rad, Target Velocity: %.2f\n", temp_angle, target_velocity);
+    // printf("Shaft Angle: %.2f rad, Target Velocity: %.2f\n", temp_angle, target_velocity);
 
     // set the maximal allowed voltage (voltage_limit) with the necessary angle
-    set_phase_voltage(voltage_limit,  0, electrical_angle(temp_angle, pole_pairs));
+    // set_phase_voltage(voltage_limit,  0, electrical_angle(temp_angle, pole_pairs));
+    set_phase_voltage(voltage_limit,  0, temp_angle);
 
     // save timestamp for next call
     open_loop_timestamp = now_us;

@@ -18,6 +18,7 @@
 #define _3_PI 9.42477796077
 #define _3_PI_2 4.71238898038
 #define _PI_2 1.57079632679
+#define _PI_3 1.0471975512 // π/3
 
 #define SIN_SCALE_FACTOR    126.6873f   // scales radians to array index
 #define SIN_INDEX_PI_2      199         // index at π/2 radians
@@ -44,7 +45,7 @@ static const foc_modulation_mode_t foc_modulation_mode = TRAPEZOIDAL_120;
 static const foc_control_mode_t foc_control_mode = FOC_CONTROL_VOLTAGE; // Can be voltage or angle control
 
 
-static const float voltage_power_supply = 12.0; // Example power supply voltage
+static const float voltage_power_supply = 5.0; // Example power supply voltage
 
 // default voltage limit is same as power supply voltage
 // This can be changed to a lower value if needed
@@ -56,9 +57,12 @@ extern int pole_pairs; // Number of pole pairs in the motor
 extern float voltage_q; // Voltage in the q-axis (quadrature axis)
 extern float voltage_d; // Voltage in the d-axis (direct axis)
 
-extern float Ua; // Phase A voltage
-extern float Ub; // Phase B voltage
-extern float Uc; // Phase C voltage
+extern float Ua_H; // Phase A voltage
+extern float Ua_L; // Phase A voltage
+extern float Ub_H; // Phase B voltage
+extern float Ub_L; // Phase B voltage
+extern float Uc_H; // Phase C voltage
+extern float Uc_L; // Phase C voltage
 
 extern float duty_A; // Duty cycle for phase A
 extern float duty_B; // Duty cycle for phase B
