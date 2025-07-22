@@ -19,6 +19,7 @@
 #define _3_PI_2 4.71238898038
 #define _PI_2 1.57079632679
 #define _PI_3 1.0471975512 // π/3
+#define _PI_4 0.78539816339 // π/4
 
 #define SIN_SCALE_FACTOR    126.6873f   // scales radians to array index
 #define SIN_INDEX_PI_2      199         // index at π/2 radians
@@ -28,7 +29,8 @@
 
 typedef enum {
   TRAPEZOIDAL_120, // Trapezoidal control with 120-degree commutation
-  FOC_SINUSOIDAL,  // Sinusoidal control
+  TRAPEZOIDAL_150,
+  SINUSOIDAL,  // Sinusoidal control
   SPACE_VECTOR     // Space vector control
 } foc_modulation_mode_t;
 
@@ -73,21 +75,21 @@ extern long open_loop_timestamp;
 extern float pot_angle;
 
 //---------//
-// extern int sin_array[200]; // Sine lookup table for fast sine calculation
+extern int sin_array[200]; // Sine lookup table for fast sine calculation
 
 
 // Function declarations for BldcController.c
 float normalize_radian_angle(float angle);
-void trapezoidal_120_set_phase_voltage(float Uq, float Ud, float elec_angle, int* sector);
-void set_phase_voltage(float Uq, float Ud, float elec_angle);
+void trapezoidal_120_set_phase_voltage(float angle, int* sector);
+void trapezoidal_150_set_phase_voltage(float angle, int* sector);
+void sinusoidal_set_phase_voltage(float angle, int* sector);
+void set_phase_voltage(float Uq, float Ud, float angle);
 
-// void loop(void);
 
-void vel_open_loop(float target_velocity);
+void velocity_open_loop(float target_velocity);
 void move_to(float target);
 float fast_rad_sin(float x);
 double fast_rad_cos(double x);
-float normalize_angle(float x);
 float electrical_angle(float mechanical_angle, int pole_pairs);
 long micros(void);
 
