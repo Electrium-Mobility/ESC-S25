@@ -50,7 +50,7 @@ void foc_task(void *pvParameters) {
     while(1){
         float target_velocity = (pot_angle / _2_PI) * 10; // Scale pot value to target velocity
 
-        vel_open_loop(target_velocity);
+        velocity_open_loop(target_velocity);
 
         // vTaskDelay(pdMS_TO_TICKS(100));
         // vTaskDelete(NULL); // Cleanly delete the task before returning

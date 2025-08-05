@@ -2,12 +2,18 @@
 #include "Driver/Bldc6PwmDriver.h"
 
 
-#define A_H 35
-#define A_L 36
-#define B_H 37
-#define B_L 38
-#define C_H 39
-#define C_L 40
+// #define A_H 35
+// #define A_L 36
+// #define B_H 37
+// #define B_L 38
+// #define C_H 39
+// #define C_L 40
+#define A_H 40
+#define A_L 39
+#define B_H 38
+#define B_L 37
+#define C_H 36
+#define C_L 35
 
 #define POT_GPIO 36 // GPIO for potentiometer input
 
@@ -316,7 +322,7 @@ void sinusoidal_set_phase_voltage(float angle, int *sector)
     Uc_H = constraint(Uc_H, 0.0f, 1.0f);
     Uc_L = constraint(Uc_L, 0.0f, 1.0f);
 
-    printf("Sector: %d \t, Rad Angle: %.2f \t, Degree Angle: %.2f \t, Percent Angle: %.2f \t, UaH: %.2f \t, UaL: %.2f \n", local_sector, angle, degree_angle, percent_angle_PI_3, Ua_H, Ua_L);
+    // printf("Sector: %d \t, Rad Angle: %.2f \t, Degree Angle: %.2f \t, Percent Angle: %.2f \t, UaH: %.2f \t, UaL: %.2f \n", local_sector, angle, degree_angle, percent_angle_PI_3, Ua_H, Ua_L);
 
     
     if (Ua_L < 0 || Ua_L > 1){
@@ -361,7 +367,7 @@ void set_phase_voltage(float Uq, float Ud, float angle)
 // }
 
 
-void vel_open_loop(float target_velocity) {
+void velocity_open_loop(float target_velocity) {
     // get current timestamp
     long now_us = micros();
     // calculate the sample time from last call

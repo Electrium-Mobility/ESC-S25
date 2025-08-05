@@ -1847,7 +1847,7 @@ rule C_STATIC_LIBRARY_LINKER____idf_main_
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = C:\Users\colin\Espressif\tools\cmake\3.30.2\bin\cmake.exe --regenerate-during-build -S"C:\Users\colin\Documents\Electrium Moblity\ESC\ESC-S25\ESC-S25" -B"C:\Users\colin\Documents\Electrium Moblity\ESC\ESC-S25\ESC-S25\build"
+  command = C:\Users\colin\Espressif\tools\cmake\3.30.2\bin\cmake.exe --regenerate-during-build -SC:\Users\colin\Documents\Electrium-Moblity\ESC\ESC-S25\ESC-S25 -BC:\Users\colin\Documents\Electrium-Moblity\ESC\ESC-S25\ESC-S25\build
   description = Re-running CMake...
   generator = 1
 
