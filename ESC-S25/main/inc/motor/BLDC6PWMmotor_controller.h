@@ -1,10 +1,9 @@
-//         FOC_MODULATION modulation; // default modulation is trapezoidal 120
-#include "math.h"
+#pragma once
+
 #include "BLDC6PWMmcpwm.h"
-#include "BLDC6PWMDriver.h"
+#include "BLDCDriver.h"
 
 #define PI 3.14159265358979323846
-
 
 typedef enum
 {
@@ -13,13 +12,14 @@ typedef enum
     Space_Vector = 2,
 } FOC_MODULATION;
 
-// #define HIGH_IMPEDANCE 0
+// Active modulation, default is trapezoidal 120 (defined in BLDC6PWMmotor_controller.cpp)
+extern FOC_MODULATION modulation;
 
-FOC_MODULATION modulation = Trapezoid_120; // default modulation is trapezoidal 120
+/// Select the driver that SetPhaseVoltage() writes to.
+void AttachDriver(BLDCDriver *driver);
 
-void UpdateBLDCMotor(float magnitude, double angle);  
+void UpdateBLDCMotor(float magnitude, double angle);
 void SetPhaseVoltage(double voltage_q, double voltage_d, double angle);
 
-void NormalizeAngle(double angle);
-
-
+/// Wrap an angle in radians into [0, 2*PI).
+double NormalizeAngle(double angle);

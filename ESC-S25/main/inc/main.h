@@ -1,9 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 
 /// GPIO ///
 
@@ -17,4 +15,3 @@
 #define GPIO_MCPWM_CAP0_IN 26
 #define GPIO_MCPWM_CAP1_IN 27
 #define GPIO_MCPWM_CAP2_IN 32
-

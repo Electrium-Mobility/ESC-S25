@@ -1,3 +1,5 @@
+#pragma once
+
 #include "BLDCDriver.h"
 #include "BLDC6PWMmcpwm.h"
 #include "DefaultValues.h"
@@ -24,9 +26,8 @@ class BLDC6PWMDriver : public BLDCDriver {
          * @brief Constructor for the BLDC6PWMDriver class with voltage and frequency parameters
          */
         BLDC6PWMDriver(int pin_A_PWM_H, int pin_A_PWM_L, int pin_B_PWM_H, int pin_B_PWM_L, int pin_C_PWM_H, int pin_C_PWM_L, 
-                int pin_CAP0, int pin_CAP1, int pin_CAP2, int enable_pin = NOT_DEFINED,
-                float voltage_limit = NOT_DEFINED, float voltage_power_supply = DEFAULT_VOLTAGE_POWER_SUPPLY,
-                int pwm_freq = NOT_DEFINED);
+                int pin_CAP0, int pin_CAP1, int pin_CAP2, int enable_pin,
+                float voltage_limit, float voltage_power_supply, int pwm_freq);
         
         
         void init(void) override;
