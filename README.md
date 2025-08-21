@@ -37,11 +37,16 @@ classDiagram
         +setPwmVoltage(Va, Vb, Vc)
     }
     class BLDC6PWMDriver {
-        +pin_A_PWM_H / pin_A_PWM_L
-        +pin_B_PWM_H / pin_B_PWM_L
-        +pin_C_PWM_H / pin_C_PWM_L
-        +pin_CAP0..2
-        +enable_pin
+        +int pin_A_PWM_H
+        +int pin_A_PWM_L
+        +int pin_B_PWM_H
+        +int pin_B_PWM_L
+        +int pin_C_PWM_H
+        +int pin_C_PWM_L
+        +int pin_CAP0
+        +int pin_CAP1
+        +int pin_CAP2
+        +int enable_pin
     }
     BLDCDriver <|-- BLDC6PWMDriver
 ```
