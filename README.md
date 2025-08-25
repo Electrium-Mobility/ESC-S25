@@ -4,7 +4,17 @@ Firmware for a 3-phase brushless DC (BLDC) electronic speed controller (ESC), bu
 
 Developed by the Electrium Mobility ESC team (Spring 2025).
 
-> **Status:** work in progress. 120° trapezoidal commutation is implemented. Sinusoidal and space-vector modulation, the capture-based position feedback, and `UpdateBLDCMotor()` are stubs.
+> **Status:** feature complete. Trapezoidal 120, sinusoidal and space-vector modulation, open-loop and hall-based closed-loop speed control, throttle input and a PID are implemented. The firmware has not been compiled or run on hardware yet, so expect to tune the gains and check hall wiring on the bench.
+
+## Features
+
+- Three modulation schemes, switched with the global `modulation`: `Trapezoid_120`, `Sinusoidal`, `Space_Vector` (min/max injection, about 15% more usable voltage than plain sine).
+- Open-loop speed control (`VelocityOpenLoop`) that integrates the angle from real elapsed time.
+- Closed-loop speed control: hall sensors give position and speed, a PID sets the q-axis voltage.
+- Potentiometer throttle on an ADC1 pin with filtering, deadband, start/stop hysteresis and an acceleration limit.
+- Protection: phase voltage clamped to what the supply and modulation can deliver, gate driver enable pin, shutdown on invalid hall code or throttle release.
+
+Control mode and tuning constants (pole pairs, speed limit, voltages, PID gains) are in [`main/inc/main.h`](ESC-S25/main/inc/main.h). Set `CONTROL_MODE` to `CONTROL_OPEN_LOOP` or `CONTROL_CLOSED_LOOP`.
 
 ## Architecture
 
@@ -72,7 +82,10 @@ ESC-S25/
     ├── CMakeLists.txt
     ├── inc/                  Headers (main.h, PWM/, motor/, motor/drivers/, misc/)
     └── src/
-        ├── main.cpp                         Entry point, open-loop demo
+        ├── main.cpp                         Entry point and control task
+        ├── control/PID.cpp                  PID with anti-windup and ramp
+        ├── sensors/HallSensor.cpp           Hall position and speed
+        ├── input/SpeedInput.cpp             Throttle ADC input
         ├── PWM/BLDC6PWMmcpwm.cpp            MCPWM pin, timer and duty setup
         └── motor/
             ├── BLDC6PWMmotor_controller.cpp Modulation (trapezoidal 120)
@@ -86,6 +99,9 @@ ESC-S25/
 | Phase A high / low | 18 / 19 | Capture 0 | 26 |
 | Phase B high / low | 21 / 22 | Capture 1 | 27 |
 | Phase C high / low | 23 / 25 | Capture 2 | 32 |
+| Gate driver enable | 4 | Throttle (ADC1) | 34 |
+
+The capture pins double as the three hall sensor inputs. If the motor runs backwards in closed loop, swap two hall wires or set `hall.reversed`.
 
 Pins are defined in [`main/inc/main.h`](ESC-S25/main/inc/main.h).
 
@@ -104,4 +120,4 @@ The MCPWM code uses the legacy `driver/mcpwm.h` API, which is deprecated in ESP-
 
 ## Safety
 
-This drives power electronics. Test with a current-limited bench supply and no propeller or load attached first. Verify dead time on a scope before connecting a motor.
+This drives power electronics. Test with a current-limited bench supply and no propeller or load attached first. Verify dead time on a scope before connecting a motor. There is no current or temperature sensing, so rely on the bench supply's current limit.
