@@ -1,6 +1,7 @@
 #include "BLDC6PWMDriver.h"
 #include "DefaultValues.h"
 #include "esp_log.h"
+#include "driver/gpio.h"
 
 #define TAG "BLDC6PWMDriver"
 
@@ -55,6 +56,13 @@ void BLDC6PWMDriver::init(void) {
     // Configure MCPWM
     MCPWM_config();
 
+    // Optional gate driver enable line, held low (driver off) until enable()
+    if (enable_pin != NOT_DEFINED) {
+        gpio_reset_pin((gpio_num_t)enable_pin);
+        gpio_set_direction((gpio_num_t)enable_pin, GPIO_MODE_OUTPUT);
+        gpio_set_level((gpio_num_t)enable_pin, 0);
+    }
+
     if (voltage_limit == NOT_DEFINED || voltage_limit > voltage_power_supply) {
         voltage_limit = voltage_power_supply;
     }
@@ -64,9 +72,16 @@ void BLDC6PWMDriver::init(void) {
 
 void BLDC6PWMDriver::enable(void) {
     MCPWM_start();
+    if (enable_pin != NOT_DEFINED) {
+        gpio_set_level((gpio_num_t)enable_pin, 1);
+    }
 }
 
 void BLDC6PWMDriver::disable(void) {
+    // Drop the gate driver first so stopping the timers can't leave a leg shorted
+    if (enable_pin != NOT_DEFINED) {
+        gpio_set_level((gpio_num_t)enable_pin, 0);
+    }
     MCPWM_stop();
 }
 
