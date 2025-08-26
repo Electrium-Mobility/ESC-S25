@@ -20,16 +20,18 @@ Control mode and tuning constants (pole pairs, speed limit, voltages, PID gains)
 
 ```mermaid
 flowchart TD
-    A["main.cpp<br/>app_main()"] --> B["BLDC6PWMDriver<br/>(implements BLDCDriver)"]
-    A --> C["Motor controller<br/>SetPhaseVoltage()"]
-    C -- "Va, Vb, Vc" --> B
-    B --> D["BLDC6PWMmcpwm<br/>MCPWM_config / MCPWM_set_duty"]
-    D --> E["ESP32 MCPWM unit 0<br/>3 timers, dead time"]
+    T["Throttle pot<br/>SpeedInput"] --> M["main.cpp<br/>control_task"]
+    HS["HallSensor"] --> M
+    M --> P["PID<br/>speed loop"]
+    P --> M
+    M --> C["Motor controller<br/>SetPhaseVoltage"]
+    C -- "Va, Vb, Vc" --> B["BLDC6PWMDriver"]
+    B --> D["BLDC6PWMmcpwm<br/>MCPWM_set_duty"]
+    D --> E["ESP32 MCPWM unit 0<br/>3 timers with dead time"]
     E --> F["6 PWM outputs"]
     F --> G["Gate driver and<br/>3-phase inverter"]
     G --> H(("BLDC motor"))
-    H -. "hall / capture inputs<br/>(planned)" .-> I["MCPWM capture<br/>CAP0-CAP2"]
-    I -.-> A
+    H -. "hall signals" .-> HS
 ```
 
 ### Class structure
@@ -47,11 +49,33 @@ classDiagram
         +setPwmVoltage(Va, Vb, Vc)
     }
     class BLDC6PWMDriver {
-        +pin_A_PWM_H / pin_A_PWM_L
-        +pin_B_PWM_H / pin_B_PWM_L
-        +pin_C_PWM_H / pin_C_PWM_L
-        +pin_CAP0..2
-        +enable_pin
+        +int pin_A_PWM_H
+        +int pin_A_PWM_L
+        +int pin_B_PWM_H
+        +int pin_B_PWM_L
+        +int pin_C_PWM_H
+        +int pin_C_PWM_L
+        +int pin_CAP0
+        +int pin_CAP1
+        +int pin_CAP2
+        +int enable_pin
+    }
+    class PID {
+        +float kp
+        +float ki
+        +float kd
+        +update(error, dt)
+        +reset()
+    }
+    class HallSensor {
+        +init()
+        +update()
+        +getElectricalAngle()
+        +getElectricalVelocity()
+    }
+    class SpeedInput {
+        +init()
+        +read()
     }
     BLDCDriver <|-- BLDC6PWMDriver
 ```
